@@ -1,9 +1,8 @@
 --Задание 2
 
 --1. Название и продолжительность самого длительного трека:
-SELECT track_name, track_length l FROM tracks
-ORDER BY l DESC
-LIMIT 1;
+SELECT track_name, track_length FROM tracks
+WHERE track_length = (SELECT MAX(track_length) FROM tracks);
 
 --2. Название треков, продолжительность которых не менее 3,5 минут:
 SELECT track_name FROM tracks
@@ -43,7 +42,11 @@ GROUP BY n;
 SELECT artist_name FROM artists a
 JOIN artist_albums aa ON aa.artist_id = a.artist_id
 JOIN albums al ON aa.album_id = al.album_id
-WHERE al.album_year != 2020;
+EXCEPT 
+SELECT artist_name FROM artists a
+JOIN artist_albums aa ON aa.artist_id = a.artist_id
+JOIN albums al ON aa.album_id = al.album_id
+WHERE al.album_year = 2020;
 
 --5. Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами):
 SELECT collection_name cn FROM collections c
@@ -73,12 +76,13 @@ HAVING COUNT(tc.track_id) = 0;
 SELECT artist_name an FROM artists a
 JOIN artist_albums aa ON aa.artist_id = a.artist_id
 JOIN tracks t ON aa.album_id = t.album_id
-GROUP BY an
-HAVING (SELECT MIN(track_length) FROM tracks) = MIN(t.track_length);
+WHERE track_length = (SELECT MIN(track_length) FROM tracks);
 
 --4. Названия альбомов, содержащих наименьшее количество треков:
 SELECT album_name an FROM albums a
 JOIN tracks t ON t.album_id = a.album_id
 GROUP BY an
-ORDER BY COUNT(track_id)
-LIMIT 1;
+HAVING COUNT(t.track_id) = (SELECT MIN(t.track_id) FROM albums a
+JOIN tracks t ON t.album_id = a.album_id
+GROUP BY a.album_name
+LIMIT 1);
