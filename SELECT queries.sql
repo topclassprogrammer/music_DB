@@ -79,10 +79,11 @@ JOIN tracks t ON aa.album_id = t.album_id
 WHERE track_length = (SELECT MIN(track_length) FROM tracks);
 
 --4. Названия альбомов, содержащих наименьшее количество треков:
-SELECT album_name an FROM albums a
+SELECT album_name an FROM albums a 
 JOIN tracks t ON t.album_id = a.album_id
 GROUP BY an
-HAVING COUNT(t.track_id) = (SELECT MIN(t.track_id) FROM albums a
+HAVING COUNT(t.track_id) = (SELECT COUNT(t.track_id) c FROM albums a
 JOIN tracks t ON t.album_id = a.album_id
-GROUP BY a.album_name
+GROUP BY a.album_name 
+ORDER BY c
 LIMIT 1);
